@@ -2,10 +2,11 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getWeatherData } from '@/services/weatherService';
-import { Sun, Cloud, CloudRain, CloudLightning, Snowflake, Wind, Droplets } from 'lucide-react';
+import { Sun, Cloud, CloudRain, CloudLightning, Snowflake, Wind, Droplets, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
 import { useIsMobile } from '@/hooks/use-mobile';
+import HourlyForecast from '@/components/HourlyForecast';
 
 const WeatherIcon = ({ condition }: { condition: string }) => {
   const iconProps = { className: "w-12 h-12 text-white" };
@@ -34,13 +35,28 @@ const Index = () => {
     );
   }
 
+  // Get current date and time
+  const currentDate = new Date();
+  const dateOptions: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' };
+  const formattedDate = currentDate.toLocaleDateString('en-US', dateOptions);
+  const formattedTime = currentDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-weather-blue to-weather-light-blue">
       <div className="max-w-md mx-auto p-6 pb-24">
-        <div className="weather-card animate-in">
+        <div className="text-white mb-6">
+          <div className="flex justify-between items-start">
+            <h1 className="text-3xl font-bold">{weatherData?.location}</h1>
+            <div className="text-right">
+              <div className="text-sm opacity-80">{formattedDate}</div>
+              <div className="text-sm opacity-80">{formattedTime}</div>
+            </div>
+          </div>
+        </div>
+
+        <Card className="weather-card animate-in p-6 bg-white/10 backdrop-blur-md border-white/20">
           <div className="text-white">
-            <h1 className="text-3xl font-bold mb-1">{weatherData?.location}</h1>
-            <div className="flex items-center justify-between mt-6">
+            <div className="flex items-center justify-between">
               <div>
                 <div className="text-6xl font-light">{weatherData?.temperature}°</div>
                 <div className="text-lg opacity-80 mt-1">
@@ -53,15 +69,19 @@ const Index = () => {
             <div className="flex justify-between mt-8">
               <div className="flex items-center">
                 <Wind className="w-5 h-5 mr-2" />
-                <span>{weatherData?.windSpeed} km/h</span>
+                <span>Wind: {weatherData?.windSpeed} km/h</span>
               </div>
               <div className="flex items-center">
                 <Droplets className="w-5 h-5 mr-2" />
-                <span>{weatherData?.humidity}%</span>
+                <span>Humidity: {weatherData?.humidity}%</span>
               </div>
             </div>
           </div>
-        </div>
+        </Card>
+
+        {weatherData?.hourlyForecast && (
+          <HourlyForecast hourlyForecast={weatherData.hourlyForecast} />
+        )}
 
         <div className="mt-6">
           <h2 className="text-white text-xl font-semibold mb-4">5-Day Forecast</h2>
