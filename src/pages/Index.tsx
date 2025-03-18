@@ -25,6 +25,9 @@ const Index = () => {
   const { data: weatherData, isLoading, isError, refetch } = useQuery({
     queryKey: ['weather', city],
     queryFn: () => getWeatherData(city),
+    onSuccess: () => {
+      saveToRecentSearches(city);
+    },
     onError: () => {
       toast.error(`Could not find weather data for ${city}`);
     }
