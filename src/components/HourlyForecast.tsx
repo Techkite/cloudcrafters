@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Sun, Cloud, CloudRain, CloudLightning, Snowflake } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { WeatherData } from '@/services/weatherService';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -8,18 +7,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 interface HourlyForecastProps {
   hourlyForecast: WeatherData['hourlyForecast'];
 }
-
-const WeatherIcon = ({ condition }: { condition: string }) => {
-  const iconProps = { className: "w-7 h-7 text-white" };
-  switch (condition) {
-    case 'sunny': return <Sun {...iconProps} />;
-    case 'cloudy': return <Cloud {...iconProps} />;
-    case 'rainy': return <CloudRain {...iconProps} />;
-    case 'stormy': return <CloudLightning {...iconProps} />;
-    case 'snowy': return <Snowflake {...iconProps} />;
-    default: return <Sun {...iconProps} />;
-  }
-};
 
 const HourlyForecast: React.FC<HourlyForecastProps> = ({ hourlyForecast }) => {
   return (
@@ -30,11 +17,11 @@ const HourlyForecast: React.FC<HourlyForecastProps> = ({ hourlyForecast }) => {
           {hourlyForecast.map((hour, index) => (
             <Card 
               key={index} 
-              className="min-w-20 p-3 text-center bg-white/10 backdrop-blur-md flex-shrink-0"
+              className="min-w-20 p-3 text-center bg-white/10 backdrop-blur-md flex-shrink-0 border-white/20"
             >
               <div className="text-white">
                 <div className="text-sm font-medium mb-2">{hour.hour}</div>
-                <WeatherIcon condition={hour.condition} />
+                <img src={hour.conditionIcon} alt={hour.condition} className="w-12 h-12 mx-auto" />
                 <div className="mt-2 text-lg">{hour.temperature}°</div>
               </div>
             </Card>

@@ -5,62 +5,45 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
-
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 210 100% 50%;
+    --primary: 221.2 83.2% 53.3%;
     --primary-foreground: 210 40% 98%;
-
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 100% 50%;
-    --accent-foreground: 210 40% 98%;
-
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
-
-    --radius: 1rem;
+    --radius: 0.75rem;
   }
 
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-
-    --primary: 210 100% 50%;
-    --primary-foreground: 210 40% 98%;
-
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
@@ -71,82 +54,78 @@
   * {
     @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground antialiased;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  input, textarea, button, select, a {
-    -webkit-tap-highlight-color: transparent;
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   }
 }
 
 @layer components {
-  .glass-morphism {
-    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-lg;
+  .animate-in {
+    animation: animate-in 0.3s ease-in-out;
   }
-
-  .weather-card {
-    @apply relative overflow-hidden rounded-3xl p-6 transition-all duration-300 bg-gradient-to-br from-weather-blue to-weather-light-blue shadow-lg;
-  }
-
-  .auth-input {
-    @apply w-full px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-foreground placeholder:text-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200;
-  }
-
-  .primary-button {
-    @apply w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium shadow-lg hover:shadow-xl hover:bg-primary/90 active:scale-[0.98] transition-all duration-200;
-  }
-
+  
   .nav-item {
-    @apply relative flex flex-col items-center justify-center p-2 rounded-full transition-all duration-200;
+    @apply flex flex-col items-center py-1 px-3 rounded-lg transition-colors;
   }
-
+  
   .nav-item.active {
-    @apply text-primary;
+    @apply bg-white/20 backdrop-blur-md;
   }
-
+  
   .nav-item-text {
-    @apply text-xs mt-1 font-medium;
+    @apply text-xs mt-1;
+  }
+  
+  .auth-input {
+    @apply bg-white/10 backdrop-blur-md border-white/20 text-white placeholder:text-white/50;
+  }
+  
+  .primary-button {
+    @apply w-full bg-white/20 backdrop-blur-md hover:bg-white/30 text-white;
+  }
+  
+  .weather-card {
+    @apply animate-in;
+  }
+  
+  .sun-pulse {
+    animation: sun-pulse 3s infinite;
+  }
+  
+  .cloud-float {
+    animation: cloud-float 4s ease-in-out infinite;
   }
 }
 
-/* Custom animations */
-.animate-in {
-  animation: fadeIn 0.5s ease-out forwards;
+@keyframes animate-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes sun-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
 }
 
-/* Weather animations */
-.cloud-float {
-  animation: cloudFloat 8s ease-in-out infinite;
-}
-
-@keyframes cloudFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
-}
-
-.sun-pulse {
-  animation: sunPulse 4s ease-in-out infinite;
-}
-
-@keyframes sunPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.05); opacity: 0.9; }
-}
-
-.rain-drop {
-  animation: rainDrop 1s linear infinite;
-}
-
-@keyframes rainDrop {
-  0% { transform: translateY(-10px); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: translateY(20px); opacity: 0; }
+@keyframes cloud-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }

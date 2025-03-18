@@ -3,12 +3,20 @@ import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
-import { User, MapPin, Mail } from 'lucide-react';
+import { User, MapPin, Mail, Clock } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { getRecentSearches } from '@/services/weatherService';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
+  const recentSearches = getRecentSearches();
+
+  const handleRecentSearch = (city: string) => {
+    navigate('/', { state: { city } });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-weather-blue to-weather-light-blue p-6 pb-24">
@@ -26,7 +34,7 @@ const Profile = () => {
             <h2 className="text-2xl font-bold mb-1">{user?.name}</h2>
             <div className="flex items-center text-white/80 mb-6">
               <MapPin className="w-4 h-4 mr-1" />
-              <span>New York, USA</span>
+              <span>Location set to: London</span>
             </div>
             <div className="w-full">
               <div className="flex items-center mb-4">
@@ -38,17 +46,28 @@ const Profile = () => {
         </Card>
 
         <Card className="mt-6 p-6 bg-white/10 backdrop-blur-md border-white/20">
-          <h3 className="text-white font-semibold mb-4">Saved Locations</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-white/80">
-              <span>New York</span>
-              <span>Primary</span>
+          <h3 className="text-white font-semibold mb-4 flex items-center">
+            <Clock className="w-5 h-5 mr-2" />
+            Recent Searches
+          </h3>
+          {recentSearches.length > 0 ? (
+            <div className="space-y-3">
+              {recentSearches.map((city, index) => (
+                <div 
+                  key={index} 
+                  className="flex items-center justify-between text-white/80 cursor-pointer hover:text-white"
+                  onClick={() => handleRecentSearch(city)}
+                >
+                  <span>{city}</span>
+                  <MapPin className="w-4 h-4" />
+                </div>
+              ))}
             </div>
-            <div className="flex items-center justify-between text-white/80">
-              <span>London</span>
-              <span>Secondary</span>
+          ) : (
+            <div className="text-white/60 text-center py-2">
+              No recent searches
             </div>
-          </div>
+          )}
         </Card>
       </div>
       

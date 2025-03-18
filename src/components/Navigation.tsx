@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Home, User, Settings } from 'lucide-react';
+import { Home, User, Settings, Heart } from 'lucide-react';
 
 const Navigation = () => {
   const location = useLocation();
@@ -15,6 +15,11 @@ const Navigation = () => {
           <Link to="/" className={`nav-item ${isActive('/') ? 'active' : ''}`}>
             <Home className="w-6 h-6 text-white" />
             <span className="nav-item-text text-white">Weather</span>
+          </Link>
+          
+          <Link to="/favorites" className={`nav-item ${isActive('/favorites') ? 'active' : ''}`}>
+            <Heart className="w-6 h-6 text-white" />
+            <span className="nav-item-text text-white">Favorites</span>
           </Link>
           
           <Link to="/profile" className={`nav-item ${isActive('/profile') ? 'active' : ''}`}>

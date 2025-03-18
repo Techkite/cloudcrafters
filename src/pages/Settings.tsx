@@ -1,14 +1,18 @@
 
 import React from 'react';
-import { useAuth } from '@/context/AuthContext';
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import Navigation from '@/components/Navigation';
-import { Settings as SettingsIcon, Bell, Globe, ThermometerSun } from 'lucide-react';
+import { Settings as SettingsIcon, Bell, Moon, Sun } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
+import { useNotifications } from '@/context/NotificationContext';
 
 const Settings = () => {
   const { logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const { notificationsEnabled, toggleNotifications } = useNotifications();
   const isMobile = useIsMobile();
 
   return (
@@ -26,27 +30,27 @@ const Settings = () => {
                 <Bell className="w-5 h-5 mr-3" />
                 <span>Notifications</span>
               </div>
-              <Switch />
+              <Switch 
+                checked={notificationsEnabled}
+                onCheckedChange={toggleNotifications}
+              />
             </div>
           </Card>
 
           <Card className="p-4 bg-white/10 backdrop-blur-md border-white/20">
             <div className="flex items-center justify-between text-white">
               <div className="flex items-center">
-                <Globe className="w-5 h-5 mr-3" />
-                <span>Location Services</span>
+                {theme === 'dark' ? (
+                  <Moon className="w-5 h-5 mr-3" />
+                ) : (
+                  <Sun className="w-5 h-5 mr-3" />
+                )}
+                <span>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
               </div>
-              <Switch />
-            </div>
-          </Card>
-
-          <Card className="p-4 bg-white/10 backdrop-blur-md border-white/20">
-            <div className="flex items-center justify-between text-white">
-              <div className="flex items-center">
-                <ThermometerSun className="w-5 h-5 mr-3" />
-                <span>Temperature Unit (°C)</span>
-              </div>
-              <Switch />
+              <Switch 
+                checked={theme === 'dark'}
+                onCheckedChange={toggleTheme}
+              />
             </div>
           </Card>
 

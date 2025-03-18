@@ -1,31 +1,44 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getWeatherData } from '@/services/weatherService';
-import { Sun, Cloud, CloudRain, CloudLightning, Snowflake, Wind, Droplets, Clock } from 'lucide-react';
+import { getWeatherData, suggestActivity, saveToRecentSearches } from '@/services/weatherService';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
 import { useIsMobile } from '@/hooks/use-mobile';
 import HourlyForecast from '@/components/HourlyForecast';
-
-const WeatherIcon = ({ condition }: { condition: string }) => {
-  const iconProps = { className: "w-12 h-12 text-white" };
-  switch (condition) {
-    case 'sunny': return <Sun {...iconProps} className="sun-pulse" />;
-    case 'cloudy': return <Cloud {...iconProps} className="cloud-float" />;
-    case 'rainy': return <CloudRain {...iconProps} />;
-    case 'stormy': return <CloudLightning {...iconProps} />;
-    case 'snowy': return <Snowflake {...iconProps} />;
-    default: return <Sun {...iconProps} />;
-  }
-};
+import SearchBar from '@/components/SearchBar';
+import { Wind, Droplets, Sunrise, Sunset } from 'lucide-react';
+import ActivitySuggestion from '@/components/ActivitySuggestion';
+import FavoriteButton from '@/components/FavoriteButton';
+import { toast } from 'sonner';
 
 const Index = () => {
   const isMobile = useIsMobile();
-  const { data: weatherData, isLoading } = useQuery({
-    queryKey: ['weather', 'New York'],
-    queryFn: () => getWeatherData('New York'),
+  const [city, setCity] = useState('London');
+
+  // Get current date and time
+  const currentDate = new Date();
+  const dateOptions: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' };
+  const formattedDate = currentDate.toLocaleDateString('en-US', dateOptions);
+  const formattedTime = currentDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+  const { data: weatherData, isLoading, isError, refetch } = useQuery({
+    queryKey: ['weather', city],
+    queryFn: () => getWeatherData(city),
+    onError: () => {
+      toast.error(`Could not find weather data for ${city}`);
+    }
   });
+
+  const handleSearch = (searchCity: string) => {
+    setCity(searchCity);
+  };
+
+  useEffect(() => {
+    if (city) {
+      refetch();
+    }
+  }, [city, refetch]);
 
   if (isLoading) {
     return (
@@ -35,18 +48,25 @@ const Index = () => {
     );
   }
 
-  // Get current date and time
-  const currentDate = new Date();
-  const dateOptions: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' };
-  const formattedDate = currentDate.toLocaleDateString('en-US', dateOptions);
-  const formattedTime = currentDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-weather-blue to-weather-light-blue p-6">
+        <SearchBar onSearch={handleSearch} initialValue={city} />
+        <div className="text-white text-center mt-10">
+          <h2 className="text-2xl font-bold mb-2">Oops!</h2>
+          <p>Could not find weather data for {city}. Please try another city.</p>
+        </div>
+        {isMobile && <Navigation />}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-weather-blue to-weather-light-blue">
       <div className="max-w-md mx-auto p-6 pb-24">
         <div className="text-white mb-6">
           <div className="flex justify-between items-start">
-            <h1 className="text-3xl font-bold">{weatherData?.location}</h1>
+            <h1 className="text-3xl font-bold">Weather</h1>
             <div className="text-right">
               <div className="text-sm opacity-80">{formattedDate}</div>
               <div className="text-sm opacity-80">{formattedTime}</div>
@@ -54,43 +74,65 @@ const Index = () => {
           </div>
         </div>
 
-        <Card className="weather-card animate-in p-6 bg-white/10 backdrop-blur-md border-white/20">
+        <SearchBar onSearch={handleSearch} initialValue={city} />
+
+        <Card className="weather-card relative p-6 bg-white/10 backdrop-blur-md border-white/20">
           <div className="text-white">
             <div className="flex items-center justify-between">
               <div>
+                <div className="text-xl font-semibold mb-1">{weatherData?.location}</div>
                 <div className="text-6xl font-light">{weatherData?.temperature}°</div>
                 <div className="text-lg opacity-80 mt-1">
-                  {weatherData?.condition.charAt(0).toUpperCase() + weatherData?.condition.slice(1)}
+                  {weatherData?.condition}
+                </div>
+                <div className="text-sm opacity-70 mt-1">
+                  Feels like {weatherData?.feelsLike}°
                 </div>
               </div>
-              <WeatherIcon condition={weatherData?.condition || 'sunny'} />
+              <img 
+                src={weatherData?.conditionIcon} 
+                alt={weatherData?.condition} 
+                className="w-24 h-24"
+              />
             </div>
             
-            <div className="flex justify-between mt-8">
+            <div className="grid grid-cols-2 gap-4 mt-6">
               <div className="flex items-center">
                 <Wind className="w-5 h-5 mr-2" />
-                <span>Wind: {weatherData?.windSpeed} km/h</span>
+                <span>{weatherData?.windSpeed} km/h</span>
               </div>
               <div className="flex items-center">
                 <Droplets className="w-5 h-5 mr-2" />
-                <span>Humidity: {weatherData?.humidity}%</span>
+                <span>{weatherData?.humidity}%</span>
+              </div>
+              <div className="flex items-center">
+                <Sunrise className="w-5 h-5 mr-2" />
+                <span>{weatherData?.sunrise}</span>
+              </div>
+              <div className="flex items-center">
+                <Sunset className="w-5 h-5 mr-2" />
+                <span>{weatherData?.sunset}</span>
               </div>
             </div>
           </div>
+          
+          <FavoriteButton city={city} />
         </Card>
 
         {weatherData?.hourlyForecast && (
           <HourlyForecast hourlyForecast={weatherData.hourlyForecast} />
         )}
 
+        <ActivitySuggestion activity={suggestActivity(weatherData!)} />
+
         <div className="mt-6">
           <h2 className="text-white text-xl font-semibold mb-4">5-Day Forecast</h2>
           <div className="grid grid-cols-5 gap-2">
             {weatherData?.forecast.map((day, index) => (
-              <Card key={index} className="p-3 text-center bg-white/10 backdrop-blur-md">
+              <Card key={index} className="p-3 text-center bg-white/10 backdrop-blur-md border-white/20">
                 <div className="text-white">
                   <div className="text-sm font-medium mb-2">{day.day}</div>
-                  <WeatherIcon condition={day.condition} />
+                  <img src={day.conditionIcon} alt={day.condition} className="w-8 h-8 mx-auto" />
                   <div className="mt-2 text-lg">{day.temperature}°</div>
                 </div>
               </Card>
